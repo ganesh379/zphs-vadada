@@ -1,22 +1,21 @@
 import React, { useState } from 'react';
 import { SearchFilterCard } from './SearchFilterCard';
-import { ResultsInitial } from './ResultsInitial';
 import { ResultsSkeleton } from './ResultsSkeleton';
 import { ResultsEmpty } from './ResultsEmpty';
 import { ResultsList } from './ResultsList';
 import { StudentDetailCard } from './StudentDetailCard';
 import { CorrectionModal } from './CorrectionModal';
 import { SAMPLE_STUDENTS } from '../../data/sampleStudents';
-import { ShieldCheck, Sparkles, UserCheck } from 'lucide-react';
+import { ShieldCheck, UserCheck } from 'lucide-react';
 
 export function RecordSearchPortal({
   t,
   lang,
   onContactSchoolClick
 }) {
-  // State machine: 'INITIAL' | 'LOADING' | 'EMPTY' | 'MULTIPLE' | 'DETAIL'
-  const [viewState, setViewState] = useState('INITIAL');
-  const [searchResults, setSearchResults] = useState([]);
+  // State machine: 'LOADING' | 'EMPTY' | 'MULTIPLE' | 'DETAIL'
+  const [viewState, setViewState] = useState('MULTIPLE');
+  const [searchResults, setSearchResults] = useState(SAMPLE_STUDENTS);
   const [selectedStudent, setSelectedStudent] = useState(null);
 
   // Correction Modal
@@ -70,8 +69,8 @@ export function RecordSearchPortal({
   };
 
   const handleClear = () => {
-    setViewState('INITIAL');
-    setSearchResults([]);
+    setViewState('MULTIPLE');
+    setSearchResults(SAMPLE_STUDENTS);
     setSelectedStudent(null);
   };
 
@@ -104,10 +103,6 @@ export function RecordSearchPortal({
 
       {/* Dynamic Results Area */}
       <div className="pt-2">
-        {viewState === 'INITIAL' && (
-          <ResultsInitial t={t} lang={lang} />
-        )}
-
         {viewState === 'LOADING' && (
           <ResultsSkeleton t={t} lang={lang} />
         )}
@@ -136,87 +131,12 @@ export function RecordSearchPortal({
             t={t}
             lang={lang}
             onBack={() => {
-              if (searchResults.length > 1) {
-                setViewState('MULTIPLE');
-              } else {
-                setViewState('INITIAL');
-              }
+              setViewState('MULTIPLE');
             }}
             onRequestCorrection={handleOpenCorrection}
             onContactSchool={onContactSchoolClick}
           />
         )}
-      </div>
-
-      {/* Demo Test Scenarios Helper Ribbon */}
-      <div className="bg-slate-100 rounded-xl p-4 sm:p-5 border border-slate-200 text-xs text-slate-700 space-y-3">
-        <div className="flex items-center space-x-2 text-emerald-900 font-bold">
-          <Sparkles className="w-4 h-4 text-amber-600" />
-          <span>Quick Prototype Test Matrix (Name + Date of Birth + Pass-Out Year)</span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-          <button
-            type="button"
-            onClick={() => handleExecuteSearch({
-              nameQuery: 'Lakshmi Devi',
-              dateOfBirth: '1999-07-25',
-              passOutYear: 2015,
-              selectedClass: 'Class 10'
-            })}
-            className="p-2.5 rounded-lg bg-white border border-slate-200 hover:border-emerald-600 text-left transition-colors shadow-2xs group"
-          >
-            <span className="font-bold text-slate-900 group-hover:text-emerald-800 block">1. Full Name + DOB Match</span>
-            <span className="text-[11px] text-slate-500">"Lakshmi Devi" • DOB: 25-Jul-1999 • 2015</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleExecuteSearch({
-              nameQuery: 'Suresh',
-              dateOfBirth: '2002-04-18',
-              passOutYear: 2018,
-              selectedClass: 'All'
-            })}
-            className="p-2.5 rounded-lg bg-white border border-slate-200 hover:border-emerald-600 text-left transition-colors shadow-2xs group"
-          >
-            <span className="font-bold text-slate-900 group-hover:text-emerald-800 block">2. Part of Name + DOB</span>
-            <span className="text-[11px] text-slate-500">"Suresh" • DOB: 18-Apr-2002 • 2018</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleExecuteSearch({
-              nameQuery: 'Vaddadi',
-              dateOfBirth: '',
-              passOutYear: 2018,
-              selectedClass: 'All'
-            })}
-            className="p-2.5 rounded-lg bg-white border border-slate-200 hover:border-emerald-600 text-left transition-colors shadow-2xs group"
-          >
-            <span className="font-bold text-slate-900 group-hover:text-emerald-800 block">3. Surname / Part of Name</span>
-            <span className="text-[11px] text-slate-500">Surname: "Vaddadi" • Year: 2018</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleExecuteSearch({
-              nameQuery: 'Unknown Student',
-              dateOfBirth: '2000-01-01',
-              passOutYear: 2020,
-              selectedClass: 'All'
-            })}
-            className="p-2.5 rounded-lg bg-white border border-slate-200 hover:border-amber-600 text-left transition-colors shadow-2xs group"
-          >
-            <span className="font-bold text-slate-900 group-hover:text-amber-800 block">4. No-Results State</span>
-            <span className="text-[11px] text-slate-500">Tests 0 matching records checklist</span>
-          </button>
-        </div>
-
-        <div className="text-[11px] text-slate-500 flex items-center justify-between pt-1 border-t border-slate-200">
-          <span>* Search secured with student full/partial name, DOB, and pass-out year authentication.</span>
-          <span className="text-emerald-800 font-semibold font-mono">10 Sample Alumni Records Indexed</span>
-        </div>
       </div>
 
       {/* Correction Request Modal */}

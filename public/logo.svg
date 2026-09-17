@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="gradBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D97706" />
+      <stop offset="50%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#B45309" />
+    </linearGradient>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0F5132" />
+      <stop offset="100%" stop-color="#0A3622" />
+    </linearGradient>
+  </defs>
+
+  <!-- Outer Ring -->
+  <circle cx="100" cy="100" r="95" fill="#FFFFFF" stroke="url(#gradBorder)" stroke-width="5" />
+  <circle cx="100" cy="100" r="86" fill="#F0FDF4" stroke="#0F5132" stroke-width="2" />
+
+  <!-- Shield Base -->
+  <path d="M 60 55 Q 100 45 140 55 Q 145 110 100 150 Q 55 110 60 55 Z" fill="url(#shieldGrad)" stroke="#D97706" stroke-width="2.5" />
+
+  <!-- Rising Sun Rays in Shield -->
+  <circle cx="100" cy="85" r="18" fill="#FDE047" opacity="0.9" />
+  <path d="M 100 60 L 100 52 M 80 70 L 73 65 M 120 70 L 127 65 M 72 85 L 64 85 M 128 85 L 136 85" stroke="#FDE047" stroke-width="2.5" stroke-linecap="round" />
+
+  <!-- Open Book of Knowledge -->
+  <path d="M 72 108 C 82 102 96 102 100 106 C 104 102 118 102 128 108 L 126 128 C 116 123 104 123 100 126 C 96 123 84 123 74 128 Z" fill="#FFFFFF" stroke="#D97706" stroke-width="1.5" />
+  <line x1="100" y1="106" x2="100" y2="126" stroke="#0F5132" stroke-width="2" />
+
+  <!-- Flame of Wisdom -->
+  <path d="M 100 88 C 96 95 93 99 97 103 C 100 106 104 103 103 99 C 107 95 102 90 100 88 Z" fill="#F97316" />
+  <path d="M 100 92 C 98 95 96 97 98 100 C 100 102 102 100 101 97 Z" fill="#FDE047" />
+
+  <!-- Golden Stars -->
+  <polygon points="45,95 47,101 53,101 48,105 50,111 45,107 40,111 42,105 37,101 43,101" fill="#D97706" />
+  <polygon points="155,95 157,101 163,101 158,105 160,111 155,107 150,111 152,105 147,101 153,101" fill="#D97706" />
+
+  <!-- Banner Ribbon at Bottom -->
+  <path d="M 45 160 L 155 160 L 145 174 L 100 171 L 55 174 Z" fill="#1E3A8A" stroke="#D97706" stroke-width="1.5" />
+  <text x="100" y="169" font-family="'Inter', sans-serif" font-size="8.5" font-weight="bold" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.5">ZPHS VADADA</text>
+
+  <!-- Circular Texts -->
+  <path id="textCircleTop" d="M 28 100 A 72 72 0 0 1 172 100" fill="none" />
+  <text font-family="'Inter', sans-serif" font-size="9.5" font-weight="700" fill="#0F5132" letter-spacing="2.2">
+    <textPath href="#textCircleTop" startOffset="50%" text-anchor="middle">
+      ZILLA PARISHAD HIGH SCHOOL
+    </textPath>
+  </text>
+</svg>

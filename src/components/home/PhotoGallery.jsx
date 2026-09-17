@@ -61,15 +61,19 @@ export function PhotoGallery({ t, lang }) {
               className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden hover:shadow-md transition-all group flex flex-col justify-between"
             >
               <div>
-                {/* SVG Visual Graphic Placeholder */}
-                <div className="relative h-48 bg-linear-to-br from-slate-800 to-emerald-950 flex flex-col items-center justify-center p-4 overflow-hidden">
-                  <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#F59E0B_1px,transparent_1px)] [background-size:12px_12px]" />
+                {/* Photograph Media Container */}
+                <div className="relative h-48 bg-slate-900 overflow-hidden">
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                  />
                   
-                  <div className="w-16 h-16 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 shadow-lg group-hover:scale-110 transition-transform">
-                    <CategoryIcon className="w-8 h-8" />
-                  </div>
+                  {/* Vignette Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
 
-                  <div className="mt-3 px-2.5 py-0.5 rounded bg-black/60 text-[11px] font-mono text-emerald-300 border border-emerald-500/30">
+                  <div className="absolute bottom-3 left-3 px-2.5 py-0.5 rounded bg-black/60 backdrop-blur-xs text-[11px] font-mono text-emerald-300 border border-emerald-500/30">
                     {item.tag}
                   </div>
 
@@ -77,7 +81,7 @@ export function PhotoGallery({ t, lang }) {
                   <div className="absolute inset-0 bg-emerald-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <button 
                       onClick={() => setSelectedImage(item)}
-                      className="px-3 py-1.5 bg-amber-500 text-slate-950 text-xs font-bold rounded-md flex items-center space-x-1.5 shadow-md"
+                      className="px-3 py-1.5 bg-amber-500 text-slate-950 text-xs font-bold rounded-md flex items-center space-x-1.5 shadow-md hover:bg-amber-400 transition-colors"
                     >
                       <Eye className="w-3.5 h-3.5" />
                       <span>{lang === 'en' ? 'Preview Details' : 'వివరాలు చూడండి'}</span>
@@ -120,10 +124,19 @@ export function PhotoGallery({ t, lang }) {
             className="bg-white rounded-xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-200 animate-scaleUp"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="h-56 bg-gradient-to-tr from-slate-900 to-emerald-900 flex flex-col items-center justify-center text-white p-6 relative">
-              <Building className="w-16 h-16 text-amber-400 mb-2" />
-              <h3 className="text-lg font-bold">{selectedImage.title}</h3>
-              <p className="text-xs text-emerald-200 font-mono mt-1">{selectedImage.tag}</p>
+            <div className="relative h-64 bg-slate-900 overflow-hidden">
+              <img
+                src={selectedImage.image}
+                alt={selectedImage.title}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent flex flex-col justify-end p-5 text-white">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300 bg-amber-950/70 border border-amber-500/40 px-2 py-0.5 rounded w-fit mb-1">
+                  {selectedImage.category}
+                </span>
+                <h3 className="text-lg font-bold leading-tight">{selectedImage.title}</h3>
+                <p className="text-xs text-emerald-300 font-mono mt-1">{selectedImage.tag}</p>
+              </div>
             </div>
             <div className="p-5 space-y-3">
               <p className="text-sm text-slate-700">{selectedImage.caption}</p>

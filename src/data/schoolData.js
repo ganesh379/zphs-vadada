@@ -106,42 +106,48 @@ export const SCHOOL_INFO = {
       title: "Main Academic Building & Assembly Ground",
       category: "Campus",
       caption: "Spacious classrooms, flag post, and verdant school grounds at Vadada.",
-      tag: "School Campus View"
+      tag: "School Campus View",
+      image: "/gallery/campus_building.jpg"
     },
     {
       id: "gal-2",
       title: "Digital IFP Smart Classroom",
       category: "Academics",
       caption: "Interactive Flat Panels installed for engaging multimedia learning in STEM subjects.",
-      tag: "Digital Smart Class"
+      tag: "Digital Smart Class",
+      image: "/gallery/smart_classroom.jpg"
     },
     {
       id: "gal-3",
       title: "Science & Innovation Laboratory",
       category: "Laboratories",
       caption: "Hands-on physics, chemistry, and biology experimental stations.",
-      tag: "Science Laboratory"
+      tag: "Science Laboratory",
+      image: "/gallery/science_laboratory.jpg"
     },
     {
       id: "gal-4",
       title: "School Library & Reading Room",
       category: "Library",
       caption: "Over 2,500 Telugu and English reference titles, journals, and encyclopedias.",
-      tag: "Library & Reading Room"
+      tag: "Library & Reading Room",
+      image: "/gallery/school_library.jpg"
     },
     {
       id: "gal-5",
       title: "Annual Sports & Athletic Meet",
       category: "Sports",
       caption: "Track events, kho-kho, volleyball, and physical fitness displays.",
-      tag: "Annual Sports Meet"
+      tag: "Annual Sports Meet",
+      image: "/gallery/sports_meet.jpg"
     },
     {
       id: "gal-6",
       title: "Mid-Day Meal Hygienic Dining Hall",
       category: "Welfare",
       caption: "Nutritious Jagananna Gorumudda meal program in a clean, sanitized dining environment.",
-      tag: "Dining Facility"
+      tag: "Dining Facility",
+      image: "/gallery/dining_hall.jpg"
     }
   ],
 

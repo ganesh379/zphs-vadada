@@ -311,6 +311,81 @@ INSERT INTO students (
     'ADM-1992-0005', '92005', 'Sanyasi Rao', 'Yalla', 'Yalla Sanyasi Rao',
     'Y. Apparao', 'Y. Guravamma', '1976-06-15', '15-Jun-1976', 1992,
     'Class 10', '9701234567', 'Telugu', 'Good', 'Verified'
+),
+(
+    'ADM-2021-0378', '21028', 'Sai Teja', 'Gedela', 'Gedela Sai Teja',
+    'G. Srinivasa Rao', 'G. Padma', '2005-10-10', '10-Oct-2005', 2021,
+    'Class 10', '9502123456', 'English', 'Exemplary', 'Verified'
+),
+(
+    'ADM-2017-0219', '17015', 'Swathi Priya', 'Botcha', 'Botcha Swathi Priya',
+    'B. Govinda Rao', 'B. Annapurna', '2001-02-04', '04-Feb-2001', 2017,
+    'Class 10', '8897012345', 'Telugu / English', 'Very Good', 'Verified'
+),
+(
+    'ADM-2014-0138', '14032', 'Ravi Varma', 'Pyla', 'Pyla Ravi Varma',
+    'P. Sambasiva Rao', 'P. Devi', '1998-08-15', '15-Aug-1998', 2014,
+    'Class 10', '9949123456', 'Telugu / English', 'Exemplary', 'Verified'
+),
+(
+    'ADM-2008-0067', '08019', 'Appala Raju', 'Meesala', 'Meesala Appala Raju',
+    'M. Ramulu', 'M. Sitamma', '1992-05-20', '20-May-1992', 2008,
+    'Class 10', '9848123450', 'Telugu', 'Good', 'Verified'
+),
+(
+    'ADM-2016-0185', '16041', 'Sandhya Rani', 'Gara', 'Gara Sandhya Rani',
+    'G. Mohan Rao', 'G. Kameswari', '2000-12-11', '11-Dec-2000', 2016,
+    'Class 10', '7032123456', 'Telugu / English', 'Exemplary', 'Verified'
+),
+(
+    'ADM-2024-0512', '24009', 'Naveen Kumar', 'Allu', 'Allu Naveen Kumar',
+    'A. Bhaskara Rao', 'A. Sujatha', '2008-06-03', '03-Jun-2008', 2024,
+    'Class 10', '8143123456', 'English', 'Exemplary', 'Verified'
+),
+(
+    'ADM-2013-0112', '13022', 'Mounika', 'Karanam', 'Karanam Mounika',
+    'K. Venkata Ramana', 'K. Gowri', '1997-09-28', '28-Sep-1997', 2013,
+    'Class 10', '9177123456', 'Telugu / English', 'Very Good', 'Verified'
+),
+(
+    'ADM-2010-0078', '10014', 'Satish Chandra', 'Kolli', 'Kolli Satish Chandra',
+    'K. Appala Swamy', 'K. Rajyalakshmi', '1994-07-05', '05-Jul-1994', 2010,
+    'Class 10', '9885123456', 'Telugu', 'Good', 'Verified'
+),
+(
+    'ADM-2022-0430', '22058', 'Haritha', 'Tammineni', 'Tammineni Haritha',
+    'T. Anand Rao', 'T. Kalavathi', '2006-11-17', '17-Nov-2006', 2022,
+    'Class 10', '7799123456', 'English', 'Exemplary', 'Verified'
+),
+(
+    'ADM-1988-0003', '88003', 'Govinda Rao', 'Sahu', 'Sahu Govinda Rao',
+    'S. Chinnarao', 'S. Appalanarasamma', '1972-03-10', '10-Mar-1972', 1988,
+    'Class 10', '9441123456', 'Telugu', 'Exemplary', 'Verified'
+),
+(
+    'ADM-2020-0340', '20042', 'Pravallika', 'Pentapati', 'Pentapati Pravallika',
+    'P. Suryanarayana', 'P. Madhavi', '2004-04-22', '22-Apr-2004', 2020,
+    'Class 10', '9398123456', 'English', 'Very Good', 'Verified'
+),
+(
+    'ADM-2023-0495', '23035', 'Tarun Simha', 'Chodisetty', 'Chodisetty Tarun Simha',
+    'C. Prasad Babu', 'C. Vani', '2007-08-14', '14-Aug-2007', 2023,
+    'Class 10', '8309123456', 'English', 'Exemplary', 'Verified'
+),
+(
+    'ADM-2011-0095', '11029', 'Sunitha', 'Dola', 'Dola Sunitha',
+    'D. Varahalu', 'D. Parvathamma', '1995-01-09', '09-Jan-1995', 2011,
+    'Class 10', '9676123456', 'Telugu / English', 'Good', 'Verified'
+),
+(
+    'ADM-2002-0021', '02008', 'Chandra Sekhar', 'Badana', 'Badana Chandra Sekhar',
+    'B. Narayanamurthy', 'B. Janakamma', '1986-10-18', '18-Oct-1986', 2002,
+    'Class 10', '9959123456', 'Telugu', 'Very Good', 'Verified'
+),
+(
+    'ADM-2019-0362', '19077', 'Divya Vani', 'Mudili', 'Mudili Divya Vani',
+    'M. Ramana Rao', 'M. Hemalatha', '2003-05-30', '30-May-2003', 2019,
+    'Class 10', '8978123456', 'Telugu / English', 'Exemplary', 'Verified'
 )
 ON CONFLICT (admission_number) DO NOTHING;
 

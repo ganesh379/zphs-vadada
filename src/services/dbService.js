@@ -14,9 +14,10 @@ class DbService {
     this.initLocalStore();
   }
 
-  // Initialize local persistent store if empty
+  // Initialize local persistent store if empty or outdated
   initLocalStore() {
-    if (!localStorage.getItem(STUDENTS_STORAGE_KEY)) {
+    const existing = this.getLocal(STUDENTS_STORAGE_KEY);
+    if (!existing || existing.length < SAMPLE_STUDENTS.length) {
       localStorage.setItem(STUDENTS_STORAGE_KEY, JSON.stringify(SAMPLE_STUDENTS));
     }
     if (!localStorage.getItem(ANNOUNCEMENTS_STORAGE_KEY)) {

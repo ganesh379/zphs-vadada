@@ -20,17 +20,9 @@ export function Header({ lang, setLang, t, activeSection, onNavigate }) {
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
-      {/* Top Govt Bar */}
+      {/* Top Utility Bar */}
       <div className="bg-emerald-900 text-white text-xs py-1.5 px-4 sm:px-6 lg:px-8 border-b border-emerald-950">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-            <span className="font-medium tracking-wide">
-              {lang === 'en' 
-                ? "Government of Andhra Pradesh • Department of School Education" 
-                : "ఆంధ్రప్రదేశ్ ప్రభుత్వం • పాఠశాల విద్యా శాఖ"}
-            </span>
-          </div>
+        <div className="max-w-7xl mx-auto flex items-center justify-end">
           
           <div className="flex items-center space-x-4">
             {/* Language Switcher */}
@@ -119,14 +111,7 @@ export function Header({ lang, setLang, t, activeSection, onNavigate }) {
           </nav>
 
           {/* Mobile Menu Button */}
-          <div className="flex lg:hidden items-center space-x-2">
-            <button
-              onClick={() => handleLinkClick('search-portal')}
-              className="px-2.5 py-1.5 text-xs font-semibold rounded-md bg-emerald-800 text-white flex items-center space-x-1 shadow-xs"
-            >
-              <Search className="w-3.5 h-3.5 text-amber-300" />
-              <span>{t.navRecords}</span>
-            </button>
+          <div className="flex lg:hidden items-center">
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

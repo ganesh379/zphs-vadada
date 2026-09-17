@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal } from '../common/Modal';
 import { Edit, UploadCloud, CheckCircle2, AlertCircle, FileCheck, Copy, Check } from 'lucide-react';
+import { dbService } from '../../services/dbService';
 
 export function CorrectionModal({
   isOpen,
@@ -35,7 +36,7 @@ export function CorrectionModal({
     setError('');
   }, [student, isOpen]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!studentName.trim()) {
       setError(lang === 'en' ? "Please enter student name." : "దయచేసి విద్యార్థి పేరు నమోదు చేయండి.");
@@ -53,12 +54,21 @@ export function CorrectionModal({
     setIsSubmitting(true);
     setError('');
 
-    // Simulate backend submission and generate reference ID
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
       const generatedRef = `REQ-2026-VAD-${Math.floor(1000 + Math.random() * 9000)}`;
+      await dbService.submitCorrectionRequest({
+        trackingRef: generatedRef,
+        studentName: studentName.trim(),
+        admissionNumber: refNumber || 'N/A',
+        applicantMobile: mobileNumber.trim(),
+        discrepancyDesc: description.trim()
+      });
+      setIsSubmitting(false);
       setSubmittedRef(generatedRef);
-    }, 600);
+    } catch (err) {
+      setIsSubmitting(false);
+      setError(err.message || 'Submission failed. Please try again.');
+    }
   };
 
   const handleCopyRef = () => {

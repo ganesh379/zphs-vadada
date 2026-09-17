@@ -1,8 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bell, Calendar, ChevronRight, FileText, Sparkles } from 'lucide-react';
 import { SCHOOL_INFO } from '../../data/schoolData';
+import { dbService } from '../../services/dbService';
 
-export function Announcements({ t, lang, onRecordArchiveClick }) {
+export function Announcements({ t, lang, dataVersion = 0, onRecordArchiveClick }) {
+  const [items, setItems] = useState(SCHOOL_INFO.announcements);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchAnnouncements = async () => {
+      try {
+        const data = await dbService.getAnnouncements();
+        if (isMounted && data && data.length > 0) {
+          // Normalize if needed
+          setItems(data);
+        }
+      } catch (err) {
+        console.warn('Failed to load announcements from DB, using fallback:', err);
+      }
+    };
+    fetchAnnouncements();
+    return () => {
+      isMounted = false;
+    };
+  }, [dataVersion]);
   return (
     <section className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-4 gap-2">
@@ -25,11 +46,15 @@ export function Announcements({ t, lang, onRecordArchiveClick }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {SCHOOL_INFO.announcements.map((ann) => (
+        {items.map((ann) => {
+          const isHighlight = ann.isNew || ann.is_important;
+          const displayTitle = (lang === 'te' && ann.title_te) ? ann.title_te : ann.title;
+          const displaySummary = ann.summary || (lang === 'en' ? 'Official administrative announcement from ZPHS Vadada.' : 'వడద ఉన్నత పాఠశాల అధికారిక ప్రకటన.');
+          return (
           <div 
             key={ann.id}
             className={`p-4 rounded-xl border transition-all hover:shadow-md flex flex-col justify-between ${
-              ann.isNew 
+              isHighlight 
                 ? 'bg-emerald-50/40 border-emerald-300 ring-1 ring-emerald-400/30' 
                 : 'bg-slate-50 border-slate-200'
             }`}
@@ -40,7 +65,7 @@ export function Announcements({ t, lang, onRecordArchiveClick }) {
                   {ann.category}
                 </span>
                 <div className="flex items-center space-x-2">
-                  {ann.isNew && (
+                  {isHighlight && (
                     <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-slate-950 uppercase tracking-wide">
                       <Sparkles className="w-2.5 h-2.5" />
                       <span>{lang === 'en' ? 'New' : 'కొత్తది'}</span>
@@ -54,10 +79,10 @@ export function Announcements({ t, lang, onRecordArchiveClick }) {
               </div>
 
               <h4 className="text-sm sm:text-base font-bold text-slate-900 mb-1.5 hover:text-emerald-800 transition-colors">
-                {ann.title}
+                {displayTitle}
               </h4>
               <p className="text-xs text-slate-600 leading-relaxed">
-                {ann.summary}
+                {displaySummary}
               </p>
             </div>
 
@@ -78,7 +103,8 @@ export function Announcements({ t, lang, onRecordArchiveClick }) {
               <span className="text-[11px] font-mono text-slate-400">Notice REF-{ann.id.toUpperCase()}</span>
             </div>
           </div>
-        ))}
+        );
+      })}
       </div>
     </section>
   );

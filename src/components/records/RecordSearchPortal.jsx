@@ -1,59 +1,65 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SearchFilterCard } from './SearchFilterCard';
 import { ResultsSkeleton } from './ResultsSkeleton';
 import { ResultsEmpty } from './ResultsEmpty';
 import { ResultsList } from './ResultsList';
 import { StudentDetailCard } from './StudentDetailCard';
 import { CorrectionModal } from './CorrectionModal';
-import { SAMPLE_STUDENTS } from '../../data/sampleStudents';
+import { dbService } from '../../services/dbService';
 import { ShieldCheck, UserCheck } from 'lucide-react';
 
 export function RecordSearchPortal({
   t,
   lang,
+  dataVersion = 0,
   onContactSchoolClick
 }) {
   // State machine: 'LOADING' | 'EMPTY' | 'MULTIPLE' | 'DETAIL'
-  const [viewState, setViewState] = useState('MULTIPLE');
-  const [searchResults, setSearchResults] = useState(SAMPLE_STUDENTS);
+  const [viewState, setViewState] = useState('LOADING');
+  const [allRecords, setAllRecords] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
 
   // Correction Modal
   const [isCorrectionOpen, setIsCorrectionOpen] = useState(false);
   const [correctionTargetStudent, setCorrectionTargetStudent] = useState(null);
 
+  // Load initial student database
+  useEffect(() => {
+    let isMounted = true;
+    const loadData = async () => {
+      setViewState('LOADING');
+      try {
+        const students = await dbService.getStudents();
+        if (isMounted) {
+          setAllRecords(students);
+          setSearchResults(students);
+          setViewState(students.length > 0 ? 'MULTIPLE' : 'EMPTY');
+        }
+      } catch (err) {
+        console.error('Error fetching students from DB:', err);
+        if (isMounted) {
+          setViewState('EMPTY');
+        }
+      }
+    };
+    loadData();
+    return () => {
+      isMounted = false;
+    };
+  }, [dataVersion]);
+
   // Search Executor: Name (full or part) + Date of Birth + Pass-Out Year + Class (optional)
-  const handleExecuteSearch = ({ nameQuery, dateOfBirth, passOutYear, selectedClass }) => {
+  const handleExecuteSearch = async ({ nameQuery, dateOfBirth, passOutYear, selectedClass }) => {
     setViewState('LOADING');
 
-    // Simulate search query latency (500ms)
-    setTimeout(() => {
-      let filtered = [...SAMPLE_STUDENTS];
-
-      // 1. Filter by Name (full name or any part of name)
-      if (nameQuery && nameQuery.trim()) {
-        const cleanQuery = nameQuery.toLowerCase().trim();
-        filtered = filtered.filter((s) =>
-          s.fullName.toLowerCase().includes(cleanQuery) ||
-          s.firstName.toLowerCase().includes(cleanQuery) ||
-          s.lastName.toLowerCase().includes(cleanQuery)
-        );
-      }
-
-      // 2. Filter by Date of Birth (DOB)
-      if (dateOfBirth) {
-        filtered = filtered.filter((s) => s.dateOfBirth === dateOfBirth);
-      }
-
-      // 3. Filter by Pass-Out Year
-      if (passOutYear) {
-        filtered = filtered.filter((s) => s.passOutYear === parseInt(passOutYear, 10));
-      }
-
-      // 4. Filter by Class (optional)
-      if (selectedClass && selectedClass !== 'All') {
-        filtered = filtered.filter((s) => s.classStudied === selectedClass);
-      }
+    try {
+      const filtered = await dbService.searchStudents({
+        nameQuery,
+        dateOfBirth,
+        passOutYear,
+        selectedClass
+      });
 
       setSearchResults(filtered);
 
@@ -65,12 +71,15 @@ export function RecordSearchPortal({
       } else {
         setViewState('MULTIPLE');
       }
-    }, 550);
+    } catch (err) {
+      console.error('Search query failed:', err);
+      setViewState('EMPTY');
+    }
   };
 
   const handleClear = () => {
     setViewState('MULTIPLE');
-    setSearchResults(SAMPLE_STUDENTS);
+    setSearchResults(allRecords);
     setSelectedStudent(null);
   };
 

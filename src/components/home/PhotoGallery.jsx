@@ -1,16 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Image as ImageIcon, ZoomIn, Eye, Sparkles, Building, BookOpen, Microscope, Trophy } from 'lucide-react';
 import { SCHOOL_INFO } from '../../data/schoolData';
+import { dbService } from '../../services/dbService';
 
-export function PhotoGallery({ t, lang }) {
+export function PhotoGallery({ t, lang, dataVersion = 0 }) {
   const [activeFilter, setActiveFilter] = useState('All');
   const [selectedImage, setSelectedImage] = useState(null);
+  const [items, setItems] = useState(SCHOOL_INFO.gallery);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchGallery = async () => {
+      try {
+        const data = await dbService.getGallery();
+        if (isMounted && data && data.length > 0) {
+          setItems(data);
+        }
+      } catch (err) {
+        console.warn('Failed to load gallery from DB, using fallback:', err);
+      }
+    };
+    fetchGallery();
+    return () => {
+      isMounted = false;
+    };
+  }, [dataVersion]);
 
   const filters = ['All', 'Campus', 'Academics', 'Laboratories', 'Sports'];
 
   const filteredItems = activeFilter === 'All'
-    ? SCHOOL_INFO.gallery
-    : SCHOOL_INFO.gallery.filter(item => item.category === activeFilter);
+    ? items
+    : items.filter(item => item.category === activeFilter);
 
   return (
     <section id="gallery" className="space-y-6">
@@ -64,7 +84,7 @@ export function PhotoGallery({ t, lang }) {
                 {/* Photograph Media Container */}
                 <div className="relative h-48 bg-slate-900 overflow-hidden">
                   <img
-                    src={item.image}
+                    src={item.image || item.image_url}
                     alt={item.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
@@ -126,7 +146,7 @@ export function PhotoGallery({ t, lang }) {
           >
             <div className="relative h-64 bg-slate-900 overflow-hidden">
               <img
-                src={selectedImage.image}
+                src={selectedImage.image || selectedImage.image_url}
                 alt={selectedImage.title}
                 className="w-full h-full object-cover"
               />

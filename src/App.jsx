@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from './components/common/Header';
 import { Footer } from './components/common/Footer';
 import { PolicyModals } from './components/common/PolicyModals';
@@ -12,6 +12,9 @@ import { ContactSection } from './components/home/ContactSection';
 import { RecordSearchPortal } from './components/records/RecordSearchPortal';
 import { PwaInstallPrompt } from './components/common/PwaInstallPrompt';
 import { MobileBottomBar } from './components/common/MobileBottomBar';
+import { AdminLoginModal } from './components/admin/AdminLoginModal';
+import { AdminDashboard } from './components/admin/AdminDashboard';
+import { authService } from './services/authService';
 import { TRANSLATIONS } from './data/translations';
 import { Info, ShieldAlert } from 'lucide-react';
 
@@ -19,6 +22,23 @@ export default function App() {
   const [lang, setLang] = useState('en'); // 'en' | 'te'
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
+
+  // Admin & CMS State
+  const [currentUser, setCurrentUser] = useState(authService.getCurrentUser());
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [adminDashboardOpen, setAdminDashboardOpen] = useState(false);
+  const [dataVersion, setDataVersion] = useState(0);
+
+  useEffect(() => {
+    const unsub = authService.subscribe((user) => {
+      setCurrentUser(user);
+    });
+    return unsub;
+  }, []);
+
+  const handleDataChanged = () => {
+    setDataVersion((prev) => prev + 1);
+  };
 
   const t = TRANSLATIONS[lang];
 
@@ -50,6 +70,10 @@ export default function App() {
         setLang={setLang}
         t={t}
         onNavigate={handleNavigate}
+        currentUser={currentUser}
+        onOpenLogin={() => setLoginModalOpen(true)}
+        onOpenAdmin={() => setAdminDashboardOpen(true)}
+        onLogout={() => authService.logout()}
       />
 
       {/* Main Content Sections */}
@@ -83,6 +107,7 @@ export default function App() {
             <RecordSearchPortal
               t={t}
               lang={lang}
+              dataVersion={dataVersion}
               onContactSchoolClick={handleContactScroll}
             />
           </div>
@@ -108,6 +133,7 @@ export default function App() {
             <Announcements
               t={t}
               lang={lang}
+              dataVersion={dataVersion}
               onRecordArchiveClick={handleSearchScroll}
             />
           </div>
@@ -125,6 +151,7 @@ export default function App() {
             <PhotoGallery
               t={t}
               lang={lang}
+              dataVersion={dataVersion}
             />
           </div>
 
@@ -169,6 +196,22 @@ export default function App() {
         onClosePrivacy={() => setPrivacyOpen(false)}
         onCloseTerms={() => setTermsOpen(false)}
         lang={lang}
+      />
+
+      {/* Admin CMS Login Dialog */}
+      <AdminLoginModal
+        isOpen={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+        onLoginSuccess={() => {
+          setAdminDashboardOpen(true);
+        }}
+      />
+
+      {/* Full Admin & CMS Dashboard */}
+      <AdminDashboard
+        isOpen={adminDashboardOpen}
+        onClose={() => setAdminDashboardOpen(false)}
+        onDataChanged={handleDataChanged}
       />
 
     </div>

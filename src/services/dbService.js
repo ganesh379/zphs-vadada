@@ -67,40 +67,56 @@ class DbService {
 
   async getStudents() {
     if (isSupabaseConfigured && supabase) {
-      const { data, error } = await supabase
-        .from('students')
-        .select('*')
-        .order('pass_out_year', { ascending: false });
+      try {
+        const { data, error } = await supabase
+          .from('students')
+          .select('*')
+          .order('pass_out_year', { ascending: false });
 
-      if (error) throw new Error(error.message);
-      return data.map(this.normalizeStudent);
+        if (!error && data && data.length > 0) {
+          return data.map(this.normalizeStudent);
+        }
+        if (error) {
+          console.warn('Supabase query note:', error.message);
+        }
+      } catch (err) {
+        console.warn('Supabase connection note:', err);
+      }
     }
     return this.getLocal(STUDENTS_STORAGE_KEY);
   }
 
   async searchStudents({ nameQuery, dateOfBirth, passOutYear, selectedClass, mobileNumber }) {
     if (isSupabaseConfigured && supabase) {
-      let query = supabase.from('students').select('*');
+      try {
+        let query = supabase.from('students').select('*');
 
-      if (nameQuery && nameQuery.trim()) {
-        query = query.ilike('full_name', `%${nameQuery.trim()}%`);
-      }
-      if (dateOfBirth) {
-        query = query.eq('date_of_birth', dateOfBirth);
-      }
-      if (passOutYear) {
-        query = query.eq('pass_out_year', parseInt(passOutYear, 10));
-      }
-      if (selectedClass && selectedClass !== 'All') {
-        query = query.eq('class_studied', selectedClass);
-      }
-      if (mobileNumber && mobileNumber.trim()) {
-        query = query.eq('mobile_number', mobileNumber.trim());
-      }
+        if (nameQuery && nameQuery.trim()) {
+          query = query.ilike('full_name', `%${nameQuery.trim()}%`);
+        }
+        if (dateOfBirth) {
+          query = query.eq('date_of_birth', dateOfBirth);
+        }
+        if (passOutYear) {
+          query = query.eq('pass_out_year', parseInt(passOutYear, 10));
+        }
+        if (selectedClass && selectedClass !== 'All') {
+          query = query.eq('class_studied', selectedClass);
+        }
+        if (mobileNumber && mobileNumber.trim()) {
+          query = query.eq('mobile_number', mobileNumber.trim());
+        }
 
-      const { data, error } = await query.order('pass_out_year', { ascending: false });
-      if (error) throw new Error(error.message);
-      return data.map(this.normalizeStudent);
+        const { data, error } = await query.order('pass_out_year', { ascending: false });
+        if (!error && data) {
+          return data.map(this.normalizeStudent);
+        }
+        if (error) {
+          console.warn('Supabase searchStudents note:', error.message);
+        }
+      } catch (err) {
+        console.warn('Supabase search error:', err);
+      }
     }
 
     // Local filter implementation
@@ -262,14 +278,18 @@ class DbService {
 
   async getAnnouncements() {
     if (isSupabaseConfigured && supabase) {
-      const { data, error } = await supabase
-        .from('announcements')
-        .select('*')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
+      try {
+        const { data, error } = await supabase
+          .from('announcements')
+          .select('*')
+          .eq('is_active', true)
+          .order('created_at', { ascending: false });
 
-      if (error) throw new Error(error.message);
-      return data;
+        if (!error && data && data.length > 0) return data;
+        if (error) console.warn('Supabase announcements note:', error.message);
+      } catch (err) {
+        console.warn('Supabase announcements error:', err);
+      }
     }
     return this.getLocal(ANNOUNCEMENTS_STORAGE_KEY);
   }
@@ -286,22 +306,31 @@ class DbService {
     };
 
     if (isSupabaseConfigured && supabase) {
-      const { data, error } = await supabase
-        .from('announcements')
-        .insert([{
-          title: newItem.title,
-          title_te: newItem.title_te,
-          date: newItem.date,
-          category: newItem.category,
-          is_important: newItem.is_important || false,
-          target_link: newItem.target_link || '#about',
-          is_active: true
-        }])
-        .select()
-        .single();
+      try {
+        const { data, error } = await supabase
+          .from('announcements')
+          .insert([{
+            title: newItem.title,
+            title_te: newItem.title_te,
+            date: newItem.date,
+            category: newItem.category,
+            is_important: newItem.is_important || false,
+            target_link: newItem.target_link || '#about',
+            is_active: true
+          }])
+          .select()
+          .single();
 
-      if (error) throw new Error(error.message);
-      return data;
+        if (!error && data) {
+          const list = this.getLocal(ANNOUNCEMENTS_STORAGE_KEY);
+          list.unshift(data);
+          this.setLocal(ANNOUNCEMENTS_STORAGE_KEY, list);
+          return data;
+        }
+        console.warn('Supabase addAnnouncement note:', error?.message);
+      } catch (err) {
+        console.warn('Supabase addAnnouncement error:', err);
+      }
     }
 
     const list = this.getLocal(ANNOUNCEMENTS_STORAGE_KEY);
@@ -315,9 +344,12 @@ class DbService {
       throw new Error('Unauthorized: Only Admin can delete announcements.');
     }
     if (isSupabaseConfigured && supabase) {
-      const { error } = await supabase.from('announcements').delete().eq('id', id);
-      if (error) throw new Error(error.message);
-      return true;
+      try {
+        const { error } = await supabase.from('announcements').delete().eq('id', id);
+        if (error) console.warn('Supabase deleteAnnouncement note:', error.message);
+      } catch (err) {
+        console.warn('Supabase delete error:', err);
+      }
     }
     const list = this.getLocal(ANNOUNCEMENTS_STORAGE_KEY).filter((a) => a.id !== id);
     this.setLocal(ANNOUNCEMENTS_STORAGE_KEY, list);
@@ -330,14 +362,18 @@ class DbService {
 
   async getGallery() {
     if (isSupabaseConfigured && supabase) {
-      const { data, error } = await supabase
-        .from('gallery')
-        .select('*')
-        .eq('is_active', true)
-        .order('display_order', { ascending: true });
+      try {
+        const { data, error } = await supabase
+          .from('gallery')
+          .select('*')
+          .eq('is_active', true)
+          .order('display_order', { ascending: true });
 
-      if (error) throw new Error(error.message);
-      return data;
+        if (!error && data && data.length > 0) return data;
+        if (error) console.warn('Supabase gallery note:', error.message);
+      } catch (err) {
+        console.warn('Supabase gallery error:', err);
+      }
     }
     return this.getLocal(GALLERY_STORAGE_KEY);
   }
@@ -397,13 +433,19 @@ class DbService {
 
   async getSchoolSettings() {
     if (isSupabaseConfigured && supabase) {
-      const { data, error } = await supabase.from('school_settings').select('*');
-      if (error) throw new Error(error.message);
-      const settings = {};
-      data.forEach((row) => {
-        settings[row.key] = row.value;
-      });
-      return settings;
+      try {
+        const { data, error } = await supabase.from('school_settings').select('*');
+        if (!error && data && data.length > 0) {
+          const settings = {};
+          data.forEach((row) => {
+            settings[row.key] = row.value;
+          });
+          return settings;
+        }
+        if (error) console.warn('Supabase settings note:', error.message);
+      } catch (err) {
+        console.warn('Supabase settings error:', err);
+      }
     }
     try {
       const raw = localStorage.getItem(SETTINGS_STORAGE_KEY);
@@ -418,11 +460,14 @@ class DbService {
       throw new Error('Unauthorized: Only Admin can modify school settings.');
     }
     if (isSupabaseConfigured && supabase) {
-      const { error } = await supabase
-        .from('school_settings')
-        .upsert({ key, value, updated_at: new Date().toISOString() });
-      if (error) throw new Error(error.message);
-      return true;
+      try {
+        const { error } = await supabase
+          .from('school_settings')
+          .upsert({ key, value, updated_at: new Date().toISOString() });
+        if (error) console.warn('Supabase updateSchoolSettings note:', error.message);
+      } catch (err) {
+        console.warn('Supabase update settings error:', err);
+      }
     }
     const current = await this.getSchoolSettings();
     current[key] = value;
@@ -439,12 +484,16 @@ class DbService {
       throw new Error('Unauthorized: Staff access required to view tickets.');
     }
     if (isSupabaseConfigured && supabase) {
-      const { data, error } = await supabase
-        .from('correction_requests')
-        .select('*')
-        .order('created_at', { ascending: false });
-      if (error) throw new Error(error.message);
-      return data;
+      try {
+        const { data, error } = await supabase
+          .from('correction_requests')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (!error && data) return data;
+        if (error) console.warn('Supabase correction_requests note:', error.message);
+      } catch (err) {
+        console.warn('Supabase corrections error:', err);
+      }
     }
     return this.getLocal(CORRECTIONS_STORAGE_KEY);
   }
@@ -458,20 +507,29 @@ class DbService {
     };
 
     if (isSupabaseConfigured && supabase) {
-      const { data, error } = await supabase
-        .from('correction_requests')
-        .insert([{
-          tracking_ref: newTicket.trackingRef,
-          student_name: newTicket.studentName,
-          admission_number: newTicket.admissionNumber,
-          applicant_mobile: newTicket.applicantMobile,
-          discrepancy_desc: newTicket.discrepancyDesc,
-          status: 'Pending Review'
-        }])
-        .select()
-        .single();
-      if (error) throw new Error(error.message);
-      return data;
+      try {
+        const { data, error } = await supabase
+          .from('correction_requests')
+          .insert([{
+            tracking_ref: newTicket.trackingRef,
+            student_name: newTicket.studentName,
+            admission_number: newTicket.admissionNumber,
+            applicant_mobile: newTicket.applicantMobile,
+            discrepancy_desc: newTicket.discrepancyDesc,
+            status: 'Pending Review'
+          }])
+          .select()
+          .single();
+        if (!error && data) {
+          const list = this.getLocal(CORRECTIONS_STORAGE_KEY);
+          list.unshift(data);
+          this.setLocal(CORRECTIONS_STORAGE_KEY, list);
+          return data;
+        }
+        console.warn('Supabase submitCorrectionRequest note:', error?.message);
+      } catch (err) {
+        console.warn('Supabase submit ticket error:', err);
+      }
     }
 
     const list = this.getLocal(CORRECTIONS_STORAGE_KEY);

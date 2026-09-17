@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from './supabaseClient';
+import { supabase, isSupabaseConfigured } from './supabaseClient.js';
 
 const AUTH_STORAGE_KEY = 'zphs_auth_session';
 
@@ -53,18 +53,27 @@ class AuthService {
 
   loadLocalSession() {
     try {
-      const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-      return stored ? JSON.parse(stored) : null;
+      if (typeof localStorage !== 'undefined') {
+        const stored = localStorage.getItem(AUTH_STORAGE_KEY);
+        return stored ? JSON.parse(stored) : null;
+      }
+      return null;
     } catch {
       return null;
     }
   }
 
   saveLocalSession(user) {
-    if (user) {
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
-    } else {
-      localStorage.removeItem(AUTH_STORAGE_KEY);
+    try {
+      if (typeof localStorage !== 'undefined') {
+        if (user) {
+          localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+        } else {
+          localStorage.removeItem(AUTH_STORAGE_KEY);
+        }
+      }
+    } catch (err) {
+      console.warn('Session save error:', err);
     }
   }
 
@@ -86,30 +95,58 @@ class AuthService {
 
   async login(email, password) {
     const cleanEmail = email.trim().toLowerCase();
+    const demo = DEMO_USERS.find(
+      (u) => u.email.toLowerCase() === cleanEmail && u.password === password
+    );
 
-    // 1. Try Supabase Auth if configured
+    // 1. If Supabase Auth is configured, attempt authentication
     if (isSupabaseConfigured && supabase) {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: cleanEmail,
-        password
-      });
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: cleanEmail,
+          password
+        });
 
-      if (error) {
-        throw new Error(error.message);
+        if (!error && data?.user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', data.user.id)
+            .single();
+
+          this.currentUser = {
+            id: data.user.id,
+            email: data.user.email,
+            fullName: profile?.full_name || demo?.fullName || data.user.email,
+            role: profile?.role || demo?.role || 'staff',
+            designation: profile?.designation || demo?.designation || 'Staff Member'
+          };
+
+          this.saveLocalSession(this.currentUser);
+          this.notifyListeners();
+          return this.currentUser;
+        }
+
+        // If not a demo user, throw the Supabase error
+        if (!demo) {
+          throw new Error(error?.message || 'Invalid login credentials.');
+        }
+      } catch (err) {
+        if (!demo) {
+          throw err;
+        }
+        console.warn('Supabase Auth note for demo account:', err.message);
       }
+    }
 
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', data.user.id)
-        .single();
-
+    // 2. Verified Demo Account Fallback (admin@zphs-vadada.edu.in / Password@123 or staff@zphs-vadada.edu.in)
+    if (demo) {
       this.currentUser = {
-        id: data.user.id,
-        email: data.user.email,
-        fullName: profile?.full_name || data.user.email,
-        role: profile?.role || 'staff',
-        designation: profile?.designation || 'Staff Member'
+        id: `usr-${demo.role}-01`,
+        email: demo.email,
+        fullName: demo.fullName,
+        role: demo.role,
+        designation: demo.designation
       };
 
       this.saveLocalSession(this.currentUser);
@@ -117,26 +154,7 @@ class AuthService {
       return this.currentUser;
     }
 
-    // 2. Local Demo fallback authentication
-    const demo = DEMO_USERS.find(
-      (u) => u.email.toLowerCase() === cleanEmail && u.password === password
-    );
-
-    if (!demo) {
-      throw new Error('Invalid email or password. Please use registered school credentials.');
-    }
-
-    this.currentUser = {
-      id: `usr-${demo.role}-01`,
-      email: demo.email,
-      fullName: demo.fullName,
-      role: demo.role,
-      designation: demo.designation
-    };
-
-    this.saveLocalSession(this.currentUser);
-    this.notifyListeners();
-    return this.currentUser;
+    throw new Error('Invalid email or password. Please use registered school credentials.');
   }
 
   async logout() {

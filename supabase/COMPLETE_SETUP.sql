@@ -524,3 +524,81 @@ INSERT INTO school_settings (key, value) VALUES
     }'::jsonb
 )
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;
+
+-- ==============================================================================
+-- PART 4: DEFAULT STAFF & ADMIN PROFILES & AUTH SEED
+-- ==============================================================================
+
+-- Create user profiles
+INSERT INTO profiles (id, email, full_name, role, designation)
+VALUES
+(
+    'a0000000-0000-0000-0000-000000000001',
+    'admin@zphs-vadada.edu.in',
+    'Sri K. Nageswara Rao',
+    'admin',
+    'Headmaster / Principal'
+),
+(
+    'a0000000-0000-0000-0000-000000000002',
+    'staff@zphs-vadada.edu.in',
+    'M. Venkata Ramana',
+    'staff',
+    'Senior Record Assistant / Data Clerk'
+)
+ON CONFLICT (email) DO UPDATE 
+SET role = EXCLUDED.role, full_name = EXCLUDED.full_name, designation = EXCLUDED.designation;
+
+-- Optionally insert into auth.users (if permitted in Supabase SQL editor)
+DO $$
+BEGIN
+    INSERT INTO auth.users (
+        instance_id,
+        id,
+        aud,
+        role,
+        email,
+        encrypted_password,
+        email_confirmed_at,
+        raw_app_meta_data,
+        raw_user_meta_data,
+        created_at,
+        updated_at,
+        confirmation_token,
+        recovery_token
+    ) VALUES 
+    (
+        '00000000-0000-0000-0000-000000000000',
+        'a0000000-0000-0000-0000-000000000001',
+        'authenticated',
+        'authenticated',
+        'admin@zphs-vadada.edu.in',
+        crypt('Password@123', gen_salt('bf')),
+        NOW(),
+        '{"provider":"email","providers":["email"]}',
+        '{"full_name":"Sri K. Nageswara Rao","role":"admin"}',
+        NOW(),
+        NOW(),
+        '',
+        ''
+    ),
+    (
+        '00000000-0000-0000-0000-000000000000',
+        'a0000000-0000-0000-0000-000000000002',
+        'authenticated',
+        'authenticated',
+        'staff@zphs-vadada.edu.in',
+        crypt('Password@123', gen_salt('bf')),
+        NOW(),
+        '{"provider":"email","providers":["email"]}',
+        '{"full_name":"M. Venkata Ramana","role":"staff"}',
+        NOW(),
+        NOW(),
+        '',
+        ''
+    )
+    ON CONFLICT (id) DO NOTHING;
+EXCEPTION
+    WHEN OTHERS THEN
+        NULL;
+END $$;
